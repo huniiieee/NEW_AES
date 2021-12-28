@@ -1,7 +1,8 @@
-#ifndef AES_ENC_H_
-#define AES_ENC_H_
+#ifndef _AES_ENC_H_
+#define _AES_ENC_H_
 
 #include "type.h"
+
 
 void AddRoundKey(byte Plain[16], byte Key[16]);
 
@@ -9,7 +10,7 @@ void SubBytes(byte Plain[16]);
 
 void ShiftRows(byte Plain[16]);
 
-byte Xtime(byte A);
+byte Xtime_2(byte A);
 
 void MixColumns(byte Plain[16]);
 

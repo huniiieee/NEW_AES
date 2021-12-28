@@ -24,12 +24,18 @@
     <ClInclude Include="AES_Enc.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="AES_Dec.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AES_Enc.c">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="main.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="AES_Dec.c">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

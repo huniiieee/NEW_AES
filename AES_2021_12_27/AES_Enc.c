@@ -1,6 +1,7 @@
 #include "AES_Enc.h"
 #include "Table.h"
 
+
 void AddRoundKey(byte Plain[16], byte Key[16])
 {
 	for (int i = 0; i < 16; i++)
@@ -39,7 +40,7 @@ void ShiftRows(byte Plain[16])
 	Plain[3] = T;
 }
 
-byte Xtime(byte A)
+byte Xtime_2(byte A)
 {
 	return (A << 1) ^ ((A >> 7) * 0x1b);
 }
@@ -51,13 +52,13 @@ void MixColumns(byte Plain[16])
 	for (int i = 0; i < 16; i++)
 	{
 		if (i % 4 == 0)
-			Plain[i] = Xtime(Temp[i]) ^ Xtime(Temp[i + 1]) ^ Temp[i + 1] ^ Temp[i + 2] ^ Temp[i + 3];
+			Plain[i] = Xtime_2(Temp[i]) ^ Xtime_2(Temp[i + 1]) ^ Temp[i + 1] ^ Temp[i + 2] ^ Temp[i + 3];
 		else if (i % 4 == 1)
-			Plain[i] = Temp[i - 1] ^ Xtime(Temp[i]) ^ Xtime(Temp[i + 1]) ^ Temp[i + 1] ^ Temp[i + 2];
+			Plain[i] = Temp[i - 1] ^ Xtime_2(Temp[i]) ^ Xtime_2(Temp[i + 1]) ^ Temp[i + 1] ^ Temp[i + 2];
 		else if (i % 4 == 2)
-			Plain[i] = Temp[i - 2] ^ Temp[i - 1] ^ Xtime(Temp[i]) ^ Xtime(Temp[i + 1]) ^ Temp[i + 1];
+			Plain[i] = Temp[i - 2] ^ Temp[i - 1] ^ Xtime_2(Temp[i]) ^ Xtime_2(Temp[i + 1]) ^ Temp[i + 1];
 		else
-			Plain[i] = Xtime(Temp[i - 3]) ^ Temp[i - 3] ^ Temp[i - 2] ^ Temp[i - 1] ^ Xtime(Temp[i]);
+			Plain[i] = Xtime_2(Temp[i - 3]) ^ Temp[i - 3] ^ Temp[i - 2] ^ Temp[i - 1] ^ Xtime_2(Temp[i]);
 	}
 }
 
@@ -71,14 +72,13 @@ void NextKey_Enc(byte Key[16], byte Rcon)
 	Key[2] = SBox[Temp[15]] ^ Temp[2];
 	Key[3] = SBox[Temp[12]] ^ Temp[3];
 
-	for (int i = 4; i < 16; i++)
+	for (int i = 4; i < 16; i++)	
 		Key[i] = Key[i - 4] ^ Temp[i];
 }
 
 void Encryption(byte Plain[16], byte Key[16], byte Output[16])
 {
 	AddRoundKey(Plain, Key);
-	byte Rcon[10] = { 0x01,0x02,0x04,0x08,0x10,0x20,0x40,0x80,0x1b,0x36 };
 	for (int i = 0; i < 9; i++)
 	{
 		NextKey_Enc(Key, Rcon[i]);
@@ -88,6 +88,7 @@ void Encryption(byte Plain[16], byte Key[16], byte Output[16])
 		AddRoundKey(Plain, Key);
 	}
 	NextKey_Enc(Key, Rcon[9]);
+	
 	SubBytes(Plain);
 	ShiftRows(Plain);
 	AddRoundKey(Plain, Key);
