@@ -17,4 +17,8 @@ void MixColumns(byte Plain[16]);
 void NextKey_Enc(byte Key[16], byte Rcon);
 
 void Encryption(byte Plain[16], byte Key[16], byte Output[16]);
+
+void Masked_SubBytes(byte Plain[16],byte Random[16]);
+
+void Masked_Encryption(byte Plain[16], byte Key[16], byte Output[16],byte Random[16]);
 #endif

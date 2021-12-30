@@ -141,6 +141,7 @@
   <ItemGroup>
     <ClInclude Include="AES_Dec.h" />
     <ClInclude Include="AES_Enc.h" />
+    <ClInclude Include="Masking.h" />
     <ClInclude Include="Table.h" />
     <ClInclude Include="type.h" />
   </ItemGroup>

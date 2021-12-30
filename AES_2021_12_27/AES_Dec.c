@@ -6,9 +6,13 @@
 void Inv_SubBytes(byte Cipher[16])
 {
 	for (int i = 0; i < 16; i++)
-	{
 		Cipher[i] = Inv_SBox[Cipher[i]];
-	}
+}
+
+void Masked_Inv_SubBytes(byte Cipher[16], byte Random[16])
+{
+	for (int i = 0; i < 16; i++)
+		Cipher[i] = Inv_SBox[Cipher[i]^Random[i]];
 }
 
 void Inv_ShiftRows(byte Cipher[16])
@@ -113,6 +117,25 @@ void Decryption(byte Cipher[16], byte Key[16], byte Output[16])
 	}
 	Inv_ShiftRows(Cipher);
 	Inv_SubBytes(Cipher);
+	PrevKey_Dec(Key, Rcon[0]);
+	AddRoundKey(Cipher, Key);
+	memcpy(Output, Cipher, 16);
+}
+
+void Masked_Decryption(byte Cipher[16], byte Key[16], byte Output[16], byte Random[16])
+{
+	AddRoundKey(Cipher, Key);
+
+	for (int i = 9; i > 0; i--)
+	{
+		Inv_ShiftRows(Cipher);
+		Masked_Inv_SubBytes(Cipher,Random);
+		PrevKey_Dec(Key, Rcon[i]);
+		AddRoundKey(Cipher, Key);
+		Inv_MixColumns(Cipher);
+	}
+	Inv_ShiftRows(Cipher);
+	Masked_Inv_SubBytes(Cipher, Random);
 	PrevKey_Dec(Key, Rcon[0]);
 	AddRoundKey(Cipher, Key);
 	memcpy(Output, Cipher, 16);

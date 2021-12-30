@@ -14,6 +14,14 @@ void SubBytes(byte Plain[16])
 		Plain[i] = SBox[Plain[i]];
 }
 
+void Masked_SubBytes(byte Plain[16],byte Random[16])
+{
+	for (int i = 0; i < 16; i++)
+		Plain[i] = SBox[Plain[i]] ^ Random[i];
+}
+
+
+
 void ShiftRows(byte Plain[16])
 {
 	byte T = 0;
@@ -90,6 +98,25 @@ void Encryption(byte Plain[16], byte Key[16], byte Output[16])
 	NextKey_Enc(Key, Rcon[9]);
 	
 	SubBytes(Plain);
+	ShiftRows(Plain);
+	AddRoundKey(Plain, Key);
+	memcpy(Output, Plain, 16);
+}
+
+void Masked_Encryption(byte Plain[16], byte Key[16], byte Output[16],byte Random[16])
+{
+	AddRoundKey(Plain, Key);
+	for (int i = 0; i < 9; i++)
+	{
+		NextKey_Enc(Key, Rcon[i]);
+		Masked_SubBytes(Plain,Random);
+		ShiftRows(Plain);
+		MixColumns(Plain);
+		AddRoundKey(Plain, Key);
+	}
+	NextKey_Enc(Key, Rcon[9]);
+
+	Masked_SubBytes(Plain,Random);
 	ShiftRows(Plain);
 	AddRoundKey(Plain, Key);
 	memcpy(Output, Plain, 16);

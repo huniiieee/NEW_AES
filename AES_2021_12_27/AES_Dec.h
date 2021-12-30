@@ -26,4 +26,8 @@ void PrevKey_Dec(byte Key[16], byte Rcon);
 
 void Decryption(byte Plain[16], byte Key[16], byte Output[16]);
 
+void Masked_Inv_SubBytes(byte Cipher[16], byte Random[16]);
+
+void Masked_Decryption(byte Cipher[16], byte Key[16], byte Output[16],byte Random[16]);
+
 #endif
