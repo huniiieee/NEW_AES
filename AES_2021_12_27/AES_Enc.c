@@ -1,6 +1,11 @@
 #include "AES_Enc.h"
 #include "Table.h"
-
+extern byte Random[16];
+extern byte S_Input_Mask;
+extern byte S_Output_Mask;
+extern byte Mixed_Input_Mask[4];
+extern byte Mixed_Output_Mask[4];
+extern byte Masked_Key[16];
 
 void AddRoundKey(byte Plain[16], byte Key[16])
 {
@@ -121,3 +126,107 @@ void Masked_Encryption(byte Plain[16], byte Key[16], byte Output[16],byte Random
 	AddRoundKey(Plain, Key);
 	memcpy(Output, Plain, 16);
 }
+
+void Real_Masked_SubBytes(byte Plain[16],Mask* mask)
+{
+	for (int i = 0; i < 16; i++)
+		Plain[i] = mask->Masked_SBox[Plain[i]];
+}
+
+void Real_Masked_ShiftRows(byte Plain[16],Mask* mask)
+{
+	byte T = 0;
+	byte T1 = 0;
+	byte T2 = 0;
+	
+	T = Plain[1];
+	Plain[1] = Plain[5];
+	Plain[5] = Plain[9];
+	Plain[9] = Plain[13];
+	Plain[13] = T;
+
+	T = Plain[2];
+	T1 = Plain[6];
+	Plain[2] = Plain[10];
+	Plain[6] = Plain[14];
+	Plain[10] = T;
+	Plain[14] = T1;
+
+	T = Plain[15];
+	Plain[15] = Plain[11];
+	Plain[11] = Plain[7];
+	Plain[7] = Plain[3];
+	Plain[3] = T;
+
+	for (int i = 0; i < 16; i++)
+	{
+		Plain[i] = Plain[i] ^ mask->Mixed_Input_Mask[i/4];
+		Plain[i] = Plain[i] ^ mask->S_Output_Mask;
+	}
+}
+
+void Real_Masked_NextKey_Enc(byte Key[16], byte Rcon,Mask* mask)
+{
+	byte Temp[16] = { 0, };
+	memcpy(Temp, Key, 16);
+
+	Key[0] = SBox[Temp[13]] ^ Temp[0] ^ Rcon;
+	Key[1] = SBox[Temp[14]] ^ Temp[1];
+	Key[2] = SBox[Temp[15]] ^ Temp[2];
+	Key[3] = SBox[Temp[12]] ^ Temp[3];
+
+	for (int i = 4; i < 16; i++)
+		Key[i] = Key[i - 4] ^ Temp[i];
+
+	for (int i = 0; i < 16; i++)
+	{
+		mask->Masked_Key[i] = Key[i] ^ mask->S_Input_Mask;
+		mask->Masked_Key[i] = mask->Masked_Key[i] ^ mask->Mixed_Output_Mask[i / 4];
+	}
+
+}
+
+void Real_Masked_NextKey_Enc_Last(byte Key[16], byte Rcon,Mask* mask)
+{
+	byte Temp[16] = { 0, };
+	memcpy(Temp, Key, 16);
+
+	Key[0] = SBox[Temp[13]] ^ Temp[0] ^ Rcon;
+	Key[1] = SBox[Temp[14]] ^ Temp[1];
+	Key[2] = SBox[Temp[15]] ^ Temp[2];
+	Key[3] = SBox[Temp[12]] ^ Temp[3];
+
+	for (int i = 4; i < 16; i++)
+		Key[i] = Key[i - 4] ^ Temp[i];
+
+	for (int i = 0; i < 16; i++)
+	{
+		mask->Masked_Key[i] = Key[i] ^ mask->Mixed_Input_Mask[i / 4];
+	}
+
+}
+
+
+void Real_Masked_Encryption(byte Plain[16], byte Key[16], byte Output[16], Mask* mask)
+{
+	AddRoundKey(Plain, mask->Masked_Key);
+	
+	for (int i = 0; i < 9; i++)
+	{
+		Real_Masked_NextKey_Enc(Key, Rcon[i],mask);
+		Real_Masked_SubBytes(Plain,mask);
+		Real_Masked_ShiftRows(Plain,mask);
+		MixColumns(Plain);
+		AddRoundKey(Plain, mask->Masked_Key);
+	}
+	Real_Masked_NextKey_Enc_Last(Key, Rcon[9],mask);
+
+	Real_Masked_SubBytes(Plain,mask);
+	Real_Masked_ShiftRows(Plain,mask);
+	AddRoundKey(Plain, mask->Masked_Key);
+	memcpy(Output, Plain, 16);
+}
+
+
+
+

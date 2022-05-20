@@ -2,6 +2,7 @@
 #define _AES_ENC_H_
 
 #include "type.h"
+#include "Masking.h"
 
 
 void AddRoundKey(byte Plain[16], byte Key[16]);
@@ -21,4 +22,16 @@ void Encryption(byte Plain[16], byte Key[16], byte Output[16]);
 void Masked_SubBytes(byte Plain[16],byte Random[16]);
 
 void Masked_Encryption(byte Plain[16], byte Key[16], byte Output[16],byte Random[16]);
+
+void Real_Masked_SubBytes(byte Plain[16],Mask* mask);
+
+void Real_Masked_ShiftRows(byte Plain[16],Mask* mask);
+
+void Real_Masked_NextKey_Enc(byte Key[16], byte Rcon,Mask* mask);
+
+void Real_Masked_NextKey_Enc_Last(byte Key[16], byte Rcon,Mask* mask);
+
+
+void Real_Masked_Encryption(byte Plain[16], byte Key[16], byte Output[16],Mask* mask);
+
 #endif

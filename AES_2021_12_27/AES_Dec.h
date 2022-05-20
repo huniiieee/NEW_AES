@@ -3,7 +3,6 @@
 
 #include "type.h"
 
-
 void Inv_SubBytes(byte Plain[16]);
 
 void Inv_ShiftRows(byte Plain[16]);
