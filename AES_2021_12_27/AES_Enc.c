@@ -227,6 +227,24 @@ void Real_Masked_Encryption(byte Plain[16], byte Key[16], byte Output[16], Mask*
 	memcpy(Output, Plain, 16);
 }
 
+void toy_AES(byte Plain[16], byte Key[16], byte Output[16])
+{
+	for (int i = 0; i < 4; i++)
+	{
+		for (int j = 0; j < 4; j++)
+		{
+			Plain[4 * j] = SBox[Plain[4 * j] ^ Key[4 * j]];
+			Plain[4 * j + 1] = SBox[Plain[4 * j + 1] ^ Key[4 * j + 1]];
+			Plain[4 * j + 2] = SBox[Plain[4 * j + 2] ^ Key[4 * j + 2]];
+			Plain[4 * j + 3] = (((Key[4 * j + 3] >> 4) * (Plain[4 * j + 3] & 0xf)) % 16) ^ (Plain[4 * j + 3] >> 4) + ((((Plain[4 * j + 3] & 0xf) + (Key[4 * j + 3] & 0xf)) % 16) << 4);
+		}
+		ShiftRows(Plain);
+		MixColumns(Plain);
+	}
+	memcpy(Output, Plain, 16);
+
+}
+
 
 
 

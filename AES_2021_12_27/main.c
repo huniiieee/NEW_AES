@@ -3,7 +3,7 @@
 #include "Table.h"
 #include "Masking.h"
 
-#define Masking 1
+#define Masking 0
 
 
 void print_128(byte text[16])
